@@ -23,12 +23,10 @@ module.exports = {
 		 * Creates a fallback object implementing the WebSocket interface
 		 */
 		function FallbackSocket() {
-
-			// WebSocket interface constants
-			const CONNECTING = 0;
-			const OPEN = 1;
-			const CLOSING = 2;
-			const CLOSED = 3;
+			var CONNECTING = 0;
+			var OPEN = 1;
+			var CLOSING = 2;
+			var CLOSED = 3;
 
 			var pollInterval;
 			var openTimout;
