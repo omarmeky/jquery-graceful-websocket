@@ -1,4 +1,4 @@
-var $ = require('jquery');	//	from consumer app
+var $ = require('jquery');
 
 module.exports = {
 	gracefulWebSocket: function (url, options) {
