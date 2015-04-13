@@ -11,7 +11,5 @@
     "url": "https://github.com/omarmeky/jquery-graceful-websocket.git"
   },
   "author": "David Lindkvist",
-  "dependencies": {
-    "jquery": "^2.1.3"
-  }
+  "dependencies": {}
 }
