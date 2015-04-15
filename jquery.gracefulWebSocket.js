@@ -1,34 +1,16 @@
 var $ = require('jquery');
+require('jQuery-ajaxTransport-XDomainRequest');
 
 module.exports = {
-	gracefulWebSocket: function (url, options) {
-		// Default properties
-		this.defaults = {
-			keepAlive: false,		// not implemented - should ping server to keep socket open
-			autoReconnect: false,	// not implemented - should try to reconnect silently if socket is closed
-			fallback: true,			// not implemented - always use HTTP fallback if native browser support is missing
-			fallbackSendURL: url.replace('ws:', 'http:').replace('wss:', 'https:'),
-			fallbackSendMethod: 'POST',
-			fallbackPollURL: url.replace('ws:', 'http:').replace('wss:', 'https:'),
-			fallbackPollMethod: 'GET',
-			fallbackOpenDelay: 100,	// number of ms to delay simulated open event
-			fallbackPollInterval: 3000,	// number of ms between poll requests
-			fallbackPollParams: {}		// optional params to pass with poll requests
-		};
-
-		// Override defaults with user properties
-		var opts = $.extend({}, this.defaults, options);
-
+	gracefulWebSocket: function (url) {
 		/**
 		 * Creates a fallback object implementing the WebSocket interface
 		 */
 		function FallbackSocket() {
-
-			// WebSocket interface constants
-			const CONNECTING = 0;
-			const OPEN = 1;
-			const CLOSING = 2;
-			const CLOSED = 3;
+			var CONNECTING = 0;
+			var OPEN = 1;
+			var CLOSING = 2;
+			var CLOSED = 3;
 
 			var pollInterval;
 			var openTimout;
@@ -42,8 +24,8 @@ module.exports = {
 					var success = true;
 					$.ajax({
 						async: false, // send synchronously
-						type: opts.fallbackSendMethod,
-						url: opts.fallbackSendURL + '?' + $.param( getFallbackParams() ),
+						type: 'POST',
+						url: url.replace('ws', 'http') + '?' + $.param( getFallbackParams() ),
 						data: data,
 						dataType: 'text',
 						contentType : "application/x-www-form-urlencoded; charset=utf-8",
@@ -76,24 +58,25 @@ module.exports = {
 				fws.currentRequest = new Date().getTime();
 
 				// extend default params with plugin options
-				return $.extend({"previousRequest": fws.previousRequest, "currentRequest": fws.currentRequest}, opts.fallbackPollParams);
+				return {
+					previousRequest: fws.previousRequest,
+					currentRequest: fws.currentRequest
+				};
 			}
 
 			/**
 			 * @param {Object} data
 			 */
 			function pollSuccess(data) {
-
 				// trigger onmessage
 				var messageEvent = {"data" : data};
 				fws.onmessage(messageEvent);
 			}
 
 			function poll() {
-
 				$.ajax({
-					type: opts.fallbackPollMethod,
-					url: opts.fallbackPollURL,
+					type: 'GET',
+					url: url.replace('ws', 'http'),
 					dataType: 'text',
 					data: getFallbackParams(),
 					success: pollSuccess,
@@ -109,9 +92,9 @@ module.exports = {
 				//fws.currentRequest = new Date().getTime();
 				$(fws).triggerHandler('open');
 				poll();
-				pollInterval = setInterval(poll, opts.fallbackPollInterval);
+				pollInterval = setInterval(poll, 3000);
 
-			}, opts.fallbackOpenDelay);
+			}, 100);
 
 			// return socket impl
 			return fws;
