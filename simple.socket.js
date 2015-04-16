@@ -70,7 +70,9 @@ module.exports = {
 			 */
 			function pollSuccess(data) {
 				// trigger onmessage
-				fws.onmessage(typeof data === 'string' ? JSON.parse(data) : data);
+				fws.onmessage(JSON.stringify({
+					data: data
+				}));
 			}
 
 			function poll() {
