@@ -12,7 +12,6 @@
   },
   "author": "David Lindkvist, forked and modified by Omar Meky",
   "dependencies": {
-    "jQuery-ajaxTransport-XDomainRequest": "git://github.com/MoonScript/jQuery-ajaxTransport-XDomainRequest",
     "jquery": "^1.11.2"
   }
 }

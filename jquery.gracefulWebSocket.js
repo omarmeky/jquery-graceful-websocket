@@ -1,5 +1,4 @@
 var $ = require('jquery');
-require('jQuery-ajaxTransport-XDomainRequest');
 
 module.exports = {
 	gracefulWebSocket: function (url) {
@@ -75,12 +74,11 @@ module.exports = {
 
 			function poll() {
 				$.ajax({
-					type: 'GET',
 					url: url.replace('ws', 'http'),
-					dataType: 'text',
+					dataType: 'jsonp',
 					data: getFallbackParams(),
 					success: pollSuccess,
-					error: function (xhr) {
+					error: function (jqXHR, textStatus, errorThrown) {
 						$(fws).triggerHandler('error');
 					}
 				});
