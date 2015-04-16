@@ -82,8 +82,15 @@ module.exports = {
 					pollSuccess(data);
 					document.getElementsByTagName('head')[0].removeChild(script);
 					script = null;
-					delete window[callback];
-				}
+					try
+					{
+						delete window[callback];
+					}
+					catch(e)
+					{
+						window[callback] = undefined;
+					}
+				};
 				script.onerror = fws.onerror;
 				document.getElementsByTagName('head')[0].appendChild(script);
 			}
