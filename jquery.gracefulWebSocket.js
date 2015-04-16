@@ -1,7 +1,5 @@
-var $ = require('jquery');
-
 module.exports = {
-	gracefulWebSocket: function (url) {
+	init: function (url) {
 		/**
 		 * Creates a fallback object implementing the WebSocket interface
 		 */
@@ -20,27 +18,31 @@ module.exports = {
 				readyState: CONNECTING,
 				bufferedAmount: 0,
 				send: function (data) {
-					var success = true;
-					$.ajax({
-						async: false, // send synchronously
-						type: 'POST',
-						url: url.replace('ws', 'http') + '?' + $.param( getFallbackParams() ),
-						data: data,
-						dataType: 'text',
-						contentType : "application/x-www-form-urlencoded; charset=utf-8",
-						success: pollSuccess,
-						error: function (xhr) {
-							success = false;
-							$(fws).triggerHandler('error');
-						}
-					});
-					return success;
+					console.error('The send method is not yet implemented.');
+
+					// TODO: implement this without jQuery
+
+					// var success = true;
+					// $.ajax({
+					// 	async: false, // send synchronously
+					// 	type: 'POST',
+					// 	url: url.replace('ws', 'http') + '?previousRequest=' + getFallbackParams().previousRequest + '&currentRequest=' + getFallbackParams().currentRequest,
+					// 	data: data,
+					// 	dataType: 'text',
+					// 	contentType : "application/x-www-form-urlencoded; charset=utf-8",
+					// 	success: pollSuccess,
+					// 	error: function (xhr) {
+					// 		success = false;
+					// 		fws.onerror();
+					// 	}
+					// });
+					// return success;
 				},
 				close: function () {
 					clearTimeout(openTimout);
 					clearInterval(pollInterval);
 					this.readyState = CLOSED;
-					$(fws).triggerHandler('close');
+					fws.onclose();
 				},
 				onopen: function () {},
 				onmessage: function () {},
@@ -73,22 +75,24 @@ module.exports = {
 			}
 
 			function poll() {
-				$.ajax({
-					url: url.replace('ws', 'http'),
-					dataType: 'jsonp',
-					data: getFallbackParams(),
-					success: pollSuccess,
-					error: function (jqXHR, textStatus, errorThrown) {
-						$(fws).triggerHandler('error');
-					}
-				});
+				var callback = 'callBack_' + +new Date;
+				var script = document.createElement('script');
+				script.type = 'text/javascript';
+				script.src = url.replace('ws', 'http') + '&callback=' + callback;
+				window[callback] = function(data) {
+					pollSuccess(data);
+					document.getElementsByTagName('head')[0].removeChild(script);
+					script = null;
+					delete window[callback];
+				}
+				script.onerror = fws.onerror;
+				document.getElementsByTagName('head')[0].appendChild(script);
 			}
 
 			// simulate open event and start polling
 			openTimout = setTimeout(function () {
 				fws.readyState = OPEN;
-				//fws.currentRequest = new Date().getTime();
-				$(fws).triggerHandler('open');
+				fws.onopen();
 				poll();
 				pollInterval = setInterval(poll, 3000);
 
@@ -100,7 +104,18 @@ module.exports = {
 
 		// create a new websocket or fallback
 		var ws = window.WebSocket ? new WebSocket(url) : new FallbackSocket();
- 		$(window).unload(function () { ws.close(); ws = null });
+
+		if (window.attachEvent) {
+			window.attachEvent('onunload', unloadHandler);
+		}
+		else if (window.addEventListener) {
+			window.addEventListener('beforeunload', unloadHandler, false);
+		}
+		function unloadHandler() {
+			ws.close();
+			ws = null;
+		}
+
 		return ws;
 	}
 };
