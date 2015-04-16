@@ -10,6 +10,12 @@ Added features:
 var simpleSocket = require('simple-socket');
 var ws = simpleSocket.init(ws://localhost/blah);
 
-//handlers are the same as jquery-graceful-websocket
+// handlers are pretty much the same as jquery-graceful-websocket
+
+// onmessage gets passed the data right away instead of an event object
+
+ws.onmessage = function(data) {
+    // do stuff with data, no need to JSON.parse it
+};
 
 ```
