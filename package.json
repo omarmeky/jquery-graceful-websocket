@@ -1,14 +1,14 @@
 {
-  "name": "jquery-graceful-websocket",
-  "version": "0.1.0",
-  "description": "Websocket with graceful degradation - jQuery plugin",
-  "main": "jquery.gracefulWebSocket.js",
+  "name": "simple-socket",
+  "version": "0.0.0",
+  "description": "A simple browser websocket implementation with jsonp polling fallback.",
+  "main": "simple.socket.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/omarmeky/jquery-graceful-websocket.git"
+    "url": "https://github.com/omarmeky/simple-socket.git"
   },
-  "author": "David Lindkvist, forked and modified by Omar Meky"
+  "author": "Based on jquery-graceful-websocket by David Lindkvist, forked and modified by Omar Meky"
 }
